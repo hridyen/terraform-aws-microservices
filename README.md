@@ -19,7 +19,8 @@ The platform is designed around:
 * CloudWatch logging
 * ECR repositories per service
 
-This architecture was intentionally designed to resemble a real enterprise deployment pattern rather than a basic tutorial setup.
+> [!NOTE]
+> This architecture was intentionally designed to resemble a real enterprise deployment pattern rather than a basic tutorial setup.
 
 ---
 
@@ -29,13 +30,33 @@ This architecture was intentionally designed to resemble a real enterprise deplo
 
 ```mermaid
 flowchart TD
-    User([User]) --> CF[CloudFront]
-    CF --> WAF[AWS WAF]
-    WAF --> ALB[Application Load Balancer - Public]
-    ALB -->|Path-Based Routing| ECS_Svc[ECS Services]
-    ECS_Svc --> ECS_Inst[ECS EC2 Instances - Private Subnets]
-    ECS_Inst --> Containers[Containers]
-    CF --> S3[Amazon S3 - Frontend]
+    %% Node Definitions
+    User([User])
+    CF[CloudFront]
+    WAF[AWS WAF]
+    ALB[Application Load Balancer - Public]
+    ECS_Svc[ECS Services]
+    ECS_Inst[ECS EC2 Instances - Private Subnets]
+    Containers[Containers]
+    S3[Amazon S3 - Frontend]
+
+    %% Connections
+    User --> CF
+    CF --> WAF
+    WAF --> ALB
+    ALB -->|Path-Based Routing| ECS_Svc
+    ECS_Svc --> ECS_Inst
+    ECS_Inst --> Containers
+    CF --> S3
+
+    %% Colors & Styling
+    classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:#232F3E,font-weight:bold
+    classDef user fill:#8C4FFF,stroke:#232F3E,stroke-width:2px,color:white,font-weight:bold
+    classDef compute fill:#14B8A6,stroke:#232F3E,stroke-width:2px,color:white,font-weight:bold
+    
+    class CF,WAF,ALB,S3 aws
+    class User user
+    class ECS_Svc,ECS_Inst,Containers compute
 ```
 
 ---
@@ -141,7 +162,8 @@ Allowed only from:
 
 * ALB Security Group
 
-No public inbound traffic allowed.
+> [!IMPORTANT]
+> No public inbound traffic allowed.
 
 ![Security Groups](./screenshots/security%20groups.png)
 
@@ -211,13 +233,13 @@ API architecture:
 User → CloudFront → ALB → ECS
 ```
 
-Benefits:
-
-* Lower latency
-* Edge caching
-* Better scalability
-* DDoS protection
-* Improved performance
+> [!TIP]
+> **Benefits:**
+> * Lower latency
+> * Edge caching
+> * Better scalability
+> * DDoS protection
+> * Improved performance
 
 ![S3 Integration](./screenshots/s3%20.png)
 
